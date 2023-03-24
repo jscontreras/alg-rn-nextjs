@@ -32,6 +32,7 @@ export function SearchBox(props) {
         autoCorrect={false}
         spellCheck={false}
         autoCompleteType="off"
+        placeholder="Search products!"
       />
     </View>
   );
@@ -41,8 +42,14 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: '#252b33',
     padding: 18,
+    flex:10,
+    flexDirection: 'column',
+    flexShrink: 0,
+    flexGrow: 0,
+    flexBasis: '80px',
   },
   input: {
+    flex:1,
     height: 48,
     padding: 12,
     fontSize: 16,
