@@ -5672,7 +5672,16 @@ react-dom@18.1.0:
     loose-envify "^1.1.0"
     scheduler "^0.22.0"
 
-react-instantsearch-hooks@^6.42.0:
+react-instantsearch-hooks-web@^6.42.0:
+  version "6.42.0"
+  resolved "https://registry.yarnpkg.com/react-instantsearch-hooks-web/-/react-instantsearch-hooks-web-6.42.0.tgz#a7edc5bdca34817773ef2cdc8ba4b5d098056969"
+  integrity sha512-l8Hhhk3Z3jAR4vffrdXpGmRLm2uphf0g1nzwMV/Ao01Co1Ygbtudg8f+Juc37TNrFcDgcK3vleBL8qMT6Ek2ng==
+  dependencies:
+    "@babel/runtime" "^7.1.2"
+    instantsearch.js "4.53.0"
+    react-instantsearch-hooks "6.42.0"
+
+react-instantsearch-hooks@6.42.0, react-instantsearch-hooks@^6.42.0:
   version "6.42.0"
   resolved "https://registry.yarnpkg.com/react-instantsearch-hooks/-/react-instantsearch-hooks-6.42.0.tgz#100b9515f990574b5219b5fa0b1686debf2e3d3c"
   integrity sha512-LPpvRuSaJ1rjqmQSnZzJ31nDQJUENVJbnOdsbJjo597DOjBc24jDbca0XFZKMfdt4d6l2CTGvwTVFdrI7t+OkA==

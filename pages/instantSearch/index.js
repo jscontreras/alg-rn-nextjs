@@ -5,6 +5,7 @@ import { InstantSearch } from 'react-instantsearch-hooks';
 import { SearchBox } from "../../components/SearchBox";
 import { InfiniteHits } from "../../components/InfiniteHits";
 import { Hit } from "../../components/Hit";
+import { FiltersView } from "../../views/FiltersView";
 
 const searchClient = algoliasearch('SGF0RZXAXL', '0ac0c3b165eb3773097eca1ac25d8fdd');
 
@@ -53,6 +54,7 @@ const Overlay = forwardRef(({ onClose }, ref) => {
       </TouchableOpacity>
       <View style={styles.overlayContent}>
         <Text style={styles.overlayText}>This is the overlay content</Text>
+        <FiltersView />
       </View>
     </View>
   );
@@ -88,12 +90,12 @@ export default function App() {
         <InstantSearch searchClient={searchClient} indexName="instant_search">
           <SearchBox onChange={scrollToTop} />
           <InfiniteHits hitComponent={Hit} />
+          <Overlay ref={overlayRef} onClose={closeOverlay} />
           <View style={styles.containerOverlay}>
             <TouchableOpacity style={styles.triggerButton} onPress={triggerOverlay}>
               <Text style={styles.triggerButtonText}>Set Filters</Text>
             </TouchableOpacity>
           </View>
-          <Overlay ref={overlayRef} onClose={closeOverlay} />
         </InstantSearch>
       </View>
     </SafeAreaView>
@@ -112,12 +114,14 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     paddingBottom: 10,
     height: 150,
+    zIndex: 99,
   },
   triggerButton: {
     backgroundColor: 'blue',
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
+    zIndex: 99,
   },
   triggerButtonText: {
     color: 'white',
@@ -132,6 +136,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     width: '100%',
     opacity: 0,
+    zIndex: 2,
   },
   closeButton: {
     position: 'absolute',
