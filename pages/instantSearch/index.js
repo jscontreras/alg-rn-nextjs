@@ -1,7 +1,7 @@
 import React, { useRef, useState, useImperativeHandle, forwardRef } from "react";
 import { SafeAreaView, StatusBar, StyleSheet, View, TouchableOpacity, Text } from 'react-native';
 import algoliasearch from 'algoliasearch/lite';
-import { InstantSearch } from 'react-instantsearch-hooks';
+import { InstantSearch, Configure } from 'react-instantsearch-hooks';
 import { SearchBox } from "../../components/SearchBox";
 import { InfiniteHits } from "../../components/InfiniteHits";
 import { Hit } from "../../components/Hit";
@@ -87,6 +87,7 @@ export default function App() {
       <StatusBar style="light" />
       <View style={styles.mainContainer}>
         <InstantSearch searchClient={searchClient} indexName="instant_search">
+          <Configure ruleContexts={['my-static-value']} />
           <SearchBox onChange={scrollToTop} />
           <InfiniteHits hitComponent={Hit} />
           <Overlay ref={overlayRef} onClose={closeOverlay} />

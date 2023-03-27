@@ -10,6 +10,7 @@ export const FiltersView = () => {
         'hierarchicalCategories.lvl2',
         'hierarchicalCategories.lvl3',
       ]}/>
+
     </ScrollView>
   );
 };

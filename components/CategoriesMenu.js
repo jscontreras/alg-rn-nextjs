@@ -70,6 +70,10 @@ export function CategoriesMenu(props) {
   // Keep up to date uiState in a reference
   useEffect(() => {
     uiStateRef.current = uiState;
+    console.log('Mount');
+    return ()=> {
+      console.log('Demount')
+    }
   }, [uiState]);
 
   return (
