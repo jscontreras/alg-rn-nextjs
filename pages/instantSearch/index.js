@@ -1,5 +1,5 @@
 import React, { useRef, useState, useImperativeHandle, forwardRef } from "react";
-import { SafeAreaView, StatusBar, StyleSheet, View, TouchableOpacity, Text, Animated } from 'react-native';
+import { SafeAreaView, StatusBar, StyleSheet, View, TouchableOpacity, Text } from 'react-native';
 import algoliasearch from 'algoliasearch/lite';
 import { InstantSearch } from 'react-instantsearch-hooks';
 import { SearchBox } from "../../components/SearchBox";
@@ -53,7 +53,6 @@ const Overlay = forwardRef(({ onClose }, ref) => {
         <Text style={styles.closeButtonText}>Close</Text>
       </TouchableOpacity>
       <View style={styles.overlayContent}>
-        <Text style={styles.overlayText}>This is the overlay content</Text>
         <FiltersView />
       </View>
     </View>

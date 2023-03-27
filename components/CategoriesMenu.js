@@ -17,7 +17,7 @@ function renderItem(item, path, key, canRefine, refine, level = 2) {
         style={styles.item}
       >
         <Text style={item.isRefined ? styles.textRefined : styles.text}>
-          {item.label}
+          {item.label} ({item.count})
         </Text>
       </TouchableOpacity>
     );
@@ -29,7 +29,7 @@ function renderItem(item, path, key, canRefine, refine, level = 2) {
           style={styles.item}
         >
           <Text style={item.isRefined ? styles.textRefined : styles.text}>
-            {item.label}
+            {item.label} ({item.count})
           </Text>
         </TouchableOpacity>
         <View style={{ marginLeft: 10 * level }}>
@@ -86,13 +86,17 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
   },
   item: {
-    padding: 8,
+    padding: 15,
+    borderBottomColor: 'lightgray',
+    borderBottomWidth: 1,
   },
   text: {
     color: 'red',
+    fontSize: 15
   },
   textRefined: {
     color: 'blue',
     fontWeight: 'bold',
+    fontSize: 15
   },
 });
