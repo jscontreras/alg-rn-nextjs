@@ -1,6 +1,5 @@
 import { useRefinementList } from 'react-instantsearch-hooks-web';
-import { View, Text, TouchableOpacity, TextInput, StyleSheet } from 'react-native-web';
-
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
 export function RefinementList(props) {
   const { title } = props;

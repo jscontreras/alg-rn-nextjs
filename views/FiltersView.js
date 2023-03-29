@@ -1,18 +1,78 @@
-import { useState, useImperativeHandle, forwardRef, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { useDynamicWidgets, useInstantSearch } from 'react-instantsearch-hooks';
-import { Dimensions, StyleSheet, ScrollView, TouchableOpacity, View, Text } from "react-native";
+import { Dimensions, StyleSheet, ScrollView, TouchableOpacity, View, Text, Animated, Platform } from "react-native";
 import { CategoriesMenu } from "../components/CategoriesMenu";
 import { RefinementList } from '../components/RefinementList';
 
+const windowHeight = Dimensions.get('window').height;
 
 export const FiltersView = () => {
   const { indexUiState, setIndexUiState } = useInstantSearch();
-  const [height, setHeight] = useState(Dimensions.get('window').height);
-  const [opacity, setOpacity] = useState(0);
+  const [transformY, setTransformY] = useState(0);
   const [recordedState, setRecordedState] = useState(null);
   const [buttonText, setButtonText] = useState('Set Filters');
   const [formState, setFormState] = useState('OPEN');
-  let i = 1;
+  const positionAnim = useRef(new Animated.Value(0)).current;
+  let start = null;
+
+  function animateOpeningWeb(currentTime) {
+    if (start == null) {
+      start = currentTime;
+    }
+    const elapsed = currentTime - start; // Calculate the elapsed time since the animation started
+    const progress = Math.min(elapsed / 300, 1); // Calculate the progress of the animation as a value between 0 and 1
+    const value = - windowHeight * progress; // Calculate the current value of the animation
+    setTransformY(value);
+    if (progress < 1) {
+      // If the animation isn't finished yet, request another frame
+      requestAnimationFrame(animateOpeningWeb);
+    }
+  }
+
+  function animateClosingWeb(currentTime) {
+    if (start == null) {
+      start = currentTime;
+    }
+    const elapsed = currentTime - start; // Calculate the elapsed time since the animation started
+    const progress = Math.min(elapsed / 300, 1); // Calculate the progress of the animation as a value between 0 and 1
+    const value = - windowHeight * (1 - progress); // Calculate the current value of the animation
+    setTransformY(value);
+    if (progress < 1) {
+      // If the animation isn't finished yet, request another frame
+      requestAnimationFrame(animateClosingWeb);
+    }
+  }
+
+
+  const animateOpening = () => {
+    if (Platform.OS === 'web') {
+      start = null;
+      requestAnimationFrame(animateOpeningWeb);
+    } else {
+      // Animation duration and target value
+      Animated.timing(positionAnim, {
+        toValue: -1 * windowHeight,
+        duration: 500,
+        useNativeDriver: false,
+      }).start();
+    }
+
+  };
+
+  const animateClose = () => {
+    if (Platform.OS === 'web') {
+      start = null;
+      requestAnimationFrame(animateClosingWeb);
+    } else {
+      // Animation duration and target value
+      Animated.timing(positionAnim, {
+        toValue: 0,
+        duration: 500,
+        useNativeDriver: false,
+      }).start();
+    }
+  };
+
 
   function onCancel() {
     setButtonText('Set Filters')
@@ -29,41 +89,18 @@ export const FiltersView = () => {
     if (formState == 'OPEN') {
       setButtonText('Submit');
       setFormState('CLOSE');
-      expandOverlay();
+      animateOpening();
     } else {
       setButtonText('Set Filters');
-      collapseOverlay();
+      animateClose();
     }
   };
 
-  const expandOverlay = () => {
-    const screenHeight = Dimensions.get('window').height;
-    const intervalId = setInterval(() => {
-      if (i >= 5) {
-        clearInterval(intervalId);
-        return;
-      }
-      const factor = i * .25 * screenHeight;
-      setHeight(screenHeight - factor);
-      setOpacity(i * .25);
-      i++;
-    }, 50);
-  };
+
 
   const collapseOverlay = () => {
     setFormState('OPEN');
-    const screenHeight = Dimensions.get('window').height;
-    let i = 0;
-    const intervalId = setInterval(() => {
-      if (i >= 5) {
-        clearInterval(intervalId);
-        return;
-      }
-      setHeight((i * .25) * screenHeight);
-      setOpacity(1 - i * .25);
-
-      i++;
-    }, 50);
+    animateClose();
     setButtonText('Set Filters')
   };
 
@@ -74,7 +111,9 @@ export const FiltersView = () => {
   return (
     <>
       {/* <View style={[styles.overlay, { height: `${height}%%`, opacity }]}> */}
-      <View style={[styles.filtersOverlay, { top: height }]}>
+      <Animated.View style={[styles.filtersOverlay, {
+        transform: [{ translateY: Platform.OS == 'web' ? transformY : positionAnim },],
+      }]}>
         <View style={styles.topLinks}>
           <TouchableOpacity style={styles.closeButton} onPress={collapseOverlay} >
             <Text style={styles.closeButtonText}>Close</Text>
@@ -85,7 +124,7 @@ export const FiltersView = () => {
             <MyDynamicWidgets facets={attributesToRender} />
           </ScrollView>
         </View>
-      </View>
+      </Animated.View>
       <View style={styles.buttonsOverlay}>
         {formState == 'CLOSE' && (
           <TouchableOpacity style={[styles.triggerButton, styles.cancelButton]} onPress={onCancel}>
@@ -115,43 +154,33 @@ const MyDynamicWidgets = ({ facets }) => {
     key: `hcat-0`
   }*/
   const organizedFacets = [
-    {
-      attributes: [
-        'skuProperties.hierarchicalCategories.lvl0',
-        'skuProperties.hierarchicalCategories.lvl1',
-        'skuProperties.hierarchicalCategories.lvl2',
-      ],
-      rootPath: null,
-      type: CategoriesMenu,
-      title: 'Categories',
-      key: `hcat-0`
-    }
   ];
-  // facets.forEach((facetName, index) => {
-  //   if (facetName.startsWith('skuProperties.hierarchicalCategories')) {
-  //     if (!hierarchicalAdded) {
-  //       hierarchicalAdded = true;
-  //       organizedFacets.push({
-  //         attributes: [
-  //           'skuProperties.hierarchicalCategories.lvl0',
-  //           'skuProperties.hierarchicalCategories.lvl1',
-  //           'skuProperties.hierarchicalCategories.lvl2'
-  //         ],
-  //         type: CategoriesMenu,
-  //         title: 'Categories',
-  //         key: `${facetName}-${index}`,
-  //         rootPath: null,
-  //       });
-  //     }
-  //   }
-  //   // add more cases
-  //   else if (!facetName.startsWith('skuProperties.hierarchicalCategories')) {
-  //     organizedFacets.push({
-  //       attribute: facetName, type: RefinementList, title: facetName.split('.').pop(), key: `${facetName}-${index}`
-  //     });
-  //   }
 
-  // });
+  facets.forEach((facetName, index) => {
+    if (facetName.startsWith('skuProperties.hierarchicalCategories')) {
+      if (!hierarchicalAdded) {
+        hierarchicalAdded = true;
+        organizedFacets.push({
+          attributes: [
+            'skuProperties.hierarchicalCategories.lvl0',
+            'skuProperties.hierarchicalCategories.lvl1',
+            'skuProperties.hierarchicalCategories.lvl2'
+          ],
+          type: CategoriesMenu,
+          title: 'Categories',
+          key: `${facetName}-${index}`,
+          rootPath: null,
+        });
+      }
+    }
+    // add more cases
+    else if (!facetName.startsWith('skuProperties.hierarchicalCategories')) {
+      organizedFacets.push({
+        attribute: facetName, type: RefinementList, title: facetName.split('.').pop(), key: `${facetName}-${index}`
+      });
+    }
+
+  });
   return <>
     {organizedFacets.map(facet => {
       const DynamicComponent = facet.type;
@@ -164,7 +193,7 @@ const MyDynamicWidgets = ({ facets }) => {
 
 const styles = StyleSheet.create({
   filtersContainer: {
-    flexBasis: Dimensions.get('window').height - 120,
+    flexBasis: windowHeight - 120,
     width: Dimensions.get('window').width,
     textAlign: 'left',
     paddingHorizontal: 20,
@@ -176,8 +205,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 0,
     right: 0,
-    height: Dimensions.get('window').height - 100,
-    backgroundColor: 'lightblue',
+    top: windowHeight,
+    height: windowHeight - 100,
+    backgroundColor: '#eee',
     display: 'flex',
     width: '100%',
     opacity: 1,
