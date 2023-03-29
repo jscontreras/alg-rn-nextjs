@@ -1,6 +1,6 @@
-import React, { useEffect, useRef } from 'react';
-import { FlatList, TouchableOpacity, View, Text, StyleSheet } from 'react-native';
-import { useHierarchicalMenu, useInstantSearch } from 'react-instantsearch-hooks-web';
+import React, { useEffect } from 'react';
+import {TouchableOpacity, View, Text, StyleSheet } from 'react-native';
+import { useHierarchicalMenu } from 'react-instantsearch-hooks-web';
 
 function renderItem(item, path, key, canRefine, refine, level = 2) {
   const refineAction = (value) => {
@@ -50,44 +50,47 @@ function renderItem(item, path, key, canRefine, refine, level = 2) {
 }
 
 export function CategoriesMenu(props) {
+  const {title} = props;
   const {
     items,
-    isShowingMore,
-    canToggleShowMore,
     canRefine,
     refine,
-    sendEvent,
-    toggleShowMore,
-    createURL,
   } = useHierarchicalMenu(props);
 
-  const { uiState, setUiState } = useInstantSearch();
-  const uiStateRef = useRef(uiState);
   const rootPathUrl = props.rootPath
     ? '/' + props.rootPath.replace(/\s>\s/g, '/')
     : '';
 
-  // Keep up to date uiState in a reference
+  // // Keep up to date uiState in a reference
   useEffect(() => {
-    uiStateRef.current = uiState;
-    console.log('Mount');
+      console.log('HM Mount');
     return ()=> {
-      console.log('Demount')
+      console.log('HM Demount')
     }
-  }, [uiState]);
+  }, []);
 
   return (
-    <View>
-      {items.map((item, key) =>
-        renderItem(item, `/category_pages${rootPathUrl}`, key, canRefine, refine)
-      )}
-    </View>
+    <>
+      <Text style={styles.title}>{title}</Text>
+      <View>
+        {items.map((item, key) =>
+          renderItem(item, `/category_pages${rootPathUrl}`, key, canRefine, refine)
+        )}
+      </View>
+    </>
+
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'column',
+  },
+  title: {
+    backgroundColor: 'lightgray',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    fontSize: 18
   },
   item: {
     padding: 15,
