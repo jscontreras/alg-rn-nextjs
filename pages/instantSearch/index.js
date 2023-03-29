@@ -19,7 +19,6 @@ export default function App() {
       <StatusBar style="light" />
       <View style={styles.mainContainer}>
         <InstantSearch searchClient={searchClient} indexName="dev_multifacets_demo">
-          <Configure ruleContexts={['my-static-value']} />
           <SearchBox onChange={scrollToTop} />
           <InfiniteHits hitComponent={Hit} />
           <FiltersView />

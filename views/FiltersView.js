@@ -7,21 +7,21 @@ import { RefinementList } from '../components/RefinementList';
 
 export const FiltersView = () => {
   const { indexUiState, setIndexUiState } = useInstantSearch();
-  const [height, setHeight] = useState(0);
+  const [height, setHeight] = useState(Dimensions.get('window').height);
   const [opacity, setOpacity] = useState(0);
   const [recordedState, setRecordedState] = useState(null);
   const [buttonText, setButtonText] = useState('Set Filters');
   const [formState, setFormState] = useState('OPEN');
-
+  let i = 1;
 
   function onCancel() {
     setButtonText('Set Filters')
-    console.log('reseting state, comming soon');
     collapseOverlay();
-
-    if (recordedState) {
-      setIndexUiState(recordedState);
-    }
+    setTimeout(() => {
+      if (recordedState) {
+        setIndexUiState(recordedState);
+      }
+    }, 400);
   }
 
   const triggerOverlay = () => {
@@ -29,7 +29,6 @@ export const FiltersView = () => {
     if (formState == 'OPEN') {
       setButtonText('Submit');
       setFormState('CLOSE');
-      console.log('setting state, comming soon');
       expandOverlay();
     } else {
       setButtonText('Set Filters');
@@ -38,13 +37,14 @@ export const FiltersView = () => {
   };
 
   const expandOverlay = () => {
-    let i = 0;
+    const screenHeight = Dimensions.get('window').height;
     const intervalId = setInterval(() => {
       if (i >= 5) {
         clearInterval(intervalId);
         return;
       }
-      setHeight(i * 25);
+      const factor = i * .25 * screenHeight;
+      setHeight(screenHeight - factor);
       setOpacity(i * .25);
       i++;
     }, 50);
@@ -52,13 +52,14 @@ export const FiltersView = () => {
 
   const collapseOverlay = () => {
     setFormState('OPEN');
+    const screenHeight = Dimensions.get('window').height;
     let i = 0;
     const intervalId = setInterval(() => {
       if (i >= 5) {
         clearInterval(intervalId);
         return;
       }
-      setHeight(100 - i * 25);
+      setHeight((i * .25) * screenHeight);
       setOpacity(1 - i * .25);
 
       i++;
@@ -72,17 +73,20 @@ export const FiltersView = () => {
 
   return (
     <>
-      <View style={[styles.overlay, { height: `${height}%`, opacity }]}>
-        <TouchableOpacity style={styles.closeButton} onPress={collapseOverlay} >
-          <Text style={styles.closeButtonText}>Close</Text>
-        </TouchableOpacity>
+      {/* <View style={[styles.overlay, { height: `${height}%%`, opacity }]}> */}
+      <View style={[styles.filtersOverlay, { top: height }]}>
+        <View style={styles.topLinks}>
+          <TouchableOpacity style={styles.closeButton} onPress={collapseOverlay} >
+            <Text style={styles.closeButtonText}>Close</Text>
+          </TouchableOpacity>
+        </View>
         <View style={styles.overlayContent}>
           <ScrollView style={styles.filtersContainer}>
             <MyDynamicWidgets facets={attributesToRender} />
           </ScrollView>
         </View>
       </View>
-      <View style={styles.containerOverlay}>
+      <View style={styles.buttonsOverlay}>
         {formState == 'CLOSE' && (
           <TouchableOpacity style={[styles.triggerButton, styles.cancelButton]} onPress={onCancel}>
             <Text style={styles.triggerButtonText}>Cancel</Text>
@@ -110,32 +114,44 @@ const MyDynamicWidgets = ({ facets }) => {
     title: 'Categories',
     key: `hcat-0`
   }*/
-  const organizedFacets = [];
-  facets.forEach((facetName, index) => {
-    if (facetName.startsWith('skuProperties.hierarchicalCategories')) {
-      if (!hierarchicalAdded) {
-        hierarchicalAdded = true;
-        organizedFacets.push({
-          attributes: [
-            'skuProperties.hierarchicalCategories.lvl0',
-            'skuProperties.hierarchicalCategories.lvl1',
-            'skuProperties.hierarchicalCategories.lvl2'
-          ],
-          type: CategoriesMenu,
-          title: 'Categories',
-          key: `${facetName}-${index}`,
-          rootPath: null,
-        });
-      }
+  const organizedFacets = [
+    {
+      attributes: [
+        'skuProperties.hierarchicalCategories.lvl0',
+        'skuProperties.hierarchicalCategories.lvl1',
+        'skuProperties.hierarchicalCategories.lvl2',
+      ],
+      rootPath: null,
+      type: CategoriesMenu,
+      title: 'Categories',
+      key: `hcat-0`
     }
-    // add more cases
-    else if (!facetName.startsWith('skuProperties.hierarchicalCategories')) {
-      organizedFacets.push({
-        attribute: facetName, type: RefinementList, title: facetName.split('.').pop(), key: `${facetName}-${index}`
-      });
-    }
+  ];
+  // facets.forEach((facetName, index) => {
+  //   if (facetName.startsWith('skuProperties.hierarchicalCategories')) {
+  //     if (!hierarchicalAdded) {
+  //       hierarchicalAdded = true;
+  //       organizedFacets.push({
+  //         attributes: [
+  //           'skuProperties.hierarchicalCategories.lvl0',
+  //           'skuProperties.hierarchicalCategories.lvl1',
+  //           'skuProperties.hierarchicalCategories.lvl2'
+  //         ],
+  //         type: CategoriesMenu,
+  //         title: 'Categories',
+  //         key: `${facetName}-${index}`,
+  //         rootPath: null,
+  //       });
+  //     }
+  //   }
+  //   // add more cases
+  //   else if (!facetName.startsWith('skuProperties.hierarchicalCategories')) {
+  //     organizedFacets.push({
+  //       attribute: facetName, type: RefinementList, title: facetName.split('.').pop(), key: `${facetName}-${index}`
+  //     });
+  //   }
 
-  });
+  // });
   return <>
     {organizedFacets.map(facet => {
       const DynamicComponent = facet.type;
@@ -149,30 +165,33 @@ const MyDynamicWidgets = ({ facets }) => {
 const styles = StyleSheet.create({
   filtersContainer: {
     flexBasis: Dimensions.get('window').height - 120,
-    width: '100vw',
+    width: Dimensions.get('window').width,
     textAlign: 'left',
     paddingHorizontal: 20,
     paddingBottom: 80,
     paddingTop: 0,
     flexGrow: 0,
   },
-  overlay: {
-    position: 'fixed',
-    bottom: 0,
+  filtersOverlay: {
+    position: 'absolute',
     left: 0,
     right: 0,
-    backgroundColor: 'white',
+    height: Dimensions.get('window').height - 100,
+    backgroundColor: 'lightblue',
     display: 'flex',
     width: '100%',
-    opacity: 0,
-    zIndex: 2,
+    opacity: 1,
+    zIndex: 0,
+  },
+  topLinks: {
+    display: 'flex',
+    width: Dimensions.get('window').width,
+    justifyContent: 'flex-end',
+    alignContent: 'flex-end',
+    flexDirection: 'row',
   },
   closeButton: {
-    position: 'absolute',
-    top: 16,
-    right: 16,
-    padding: 8,
-    zIndex: 9,
+    padding: 20,
   },
   closeButtonText: {
     color: 'blue',
@@ -196,20 +215,21 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'stretch'
   },
-  containerOverlay: {
+  buttonsOverlay: {
+    position: 'fixed',
+    bottom: 0,
     flex: 10,
-    flexDirection:'row',
+    flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     flexGrow: 10,
     width: '100%',
-    flexBasis: 200,
+    flexBasis: 100,
     backgroundColor: '#252b33',
     paddingTop: 10,
     paddingBottom: 10,
-    height: 150,
-    zIndex: 99,
-
+    height: 100,
+    zIndex: 10,
   },
   triggerButton: {
     backgroundColor: 'blue',

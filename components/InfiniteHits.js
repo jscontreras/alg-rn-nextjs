@@ -37,6 +37,6 @@ const styles = StyleSheet.create({
   container: {
     flexShrink: 0,
     flexGrow: 0,
-    flexBasis: Dimensions.get('window').height - 150,
+    flexBasis: Dimensions.get('window').height - 220,
   }
 });

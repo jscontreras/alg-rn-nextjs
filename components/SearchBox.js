@@ -46,11 +46,11 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     flexShrink: 0,
     flexGrow: 0,
-    flexBasis: '80px',
+    flexBasis: 80,
   },
   input: {
     flex:1,
-    height: 48,
+    height: 50,
     padding: 12,
     fontSize: 16,
     backgroundColor: '#fff',
