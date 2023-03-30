@@ -1,6 +1,8 @@
 import React from 'react';
-import { StyleSheet, View, FlatList, Dimensions } from 'react-native';
+import { StyleSheet, View, FlatList, Dimensions, Platform } from 'react-native';
 import { useInfiniteHits } from 'react-instantsearch-hooks';
+
+const heightParam = Platform.OS == 'ios' ? 'screen' : 'window';
 
 export function InfiniteHits({ hitComponent: Hit, ...props }) {
   const { hits, isLastPage, showMore } = useInfiniteHits(props);
@@ -37,6 +39,6 @@ const styles = StyleSheet.create({
   container: {
     flexShrink: 0,
     flexGrow: 0,
-    flexBasis: Dimensions.get('window').height - 220,
+    flexBasis: Dimensions.get(heightParam).height - 180,
   }
 });

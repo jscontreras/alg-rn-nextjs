@@ -2,9 +2,11 @@ import { useState, useRef } from 'react';
 import { useDynamicWidgets, useInstantSearch } from 'react-instantsearch-hooks';
 import { Dimensions, StyleSheet, ScrollView, TouchableOpacity, View, Text, Animated, Platform } from "react-native";
 import { CategoriesMenu } from "../components/CategoriesMenu";
+import { PriceRangePicker } from '../components/PriceRangePicker';
 import { RefinementList } from '../components/RefinementList';
 
-const windowHeight = Dimensions.get('window').height;
+const heightParam = Platform.OS == 'ios' ? 'screen' : 'window';
+const windowHeight = Dimensions.get(heightParam).height;
 
 export const FiltersView = () => {
   const { indexUiState, setIndexUiState } = useInstantSearch();
@@ -165,6 +167,19 @@ const MyDynamicWidgets = ({ facets }) => {
         });
       }
     }
+
+    // skuProperties.prices.brlDefault.salePrice case
+    else if (facetName === 'skuProperties.prices.brlDefault.salePrice') {
+      organizedFacets.push({
+        attribute: facetName, type: PriceRangePicker, title: 'Price ($)', key: `${facetName}-${index}`
+      });
+    }
+    // skuProperties.prices.ptsDefault.salePrice
+    else if (facetName === 'skuProperties.prices.ptsDefault.salePrice') {
+      organizedFacets.push({
+        attribute: facetName, type: PriceRangePicker, title: 'Price (points)', key: `${facetName}-${index}`
+      });
+    }
     // add more cases
     else if (!facetName.startsWith('skuProperties.hierarchicalCategories')) {
       organizedFacets.push({
@@ -173,23 +188,22 @@ const MyDynamicWidgets = ({ facets }) => {
     }
 
   });
-  return <>
+  return <View styles='facetsContainer'>
     {organizedFacets.map(facet => {
       const DynamicComponent = facet.type;
       const facetProps = { ...facet };
       delete facetProps.type;
       return <DynamicComponent {...facetProps} />
     })}
-  </>
+  </View>
 }
 
 const styles = StyleSheet.create({
   filtersContainer: {
-    flexBasis: windowHeight - 120,
-    width: Dimensions.get('window').width,
+    flexBasis: windowHeight - 150,
+    width: Dimensions.get(heightParam).width,
     textAlign: 'left',
     paddingHorizontal: 20,
-    paddingBottom: 80,
     paddingTop: 0,
     flexGrow: 0,
   },
@@ -198,16 +212,19 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     top: windowHeight,
-    height: windowHeight - 100,
+    height: windowHeight - (Platform.OS === 'ios' ? 150 : 80),
     backgroundColor: '#eee',
     display: 'flex',
     width: '100%',
     opacity: 1,
     zIndex: 0,
   },
+  facetsContainer: {
+    paddingBottom: 80,
+  },
   topLinks: {
     display: 'flex',
-    width: Dimensions.get('window').width,
+    width: Dimensions.get(heightParam).width,
     justifyContent: 'flex-end',
     alignContent: 'flex-end',
     flexDirection: 'row',
@@ -239,17 +256,17 @@ const styles = StyleSheet.create({
   },
   buttonsOverlay: {
     position: 'absolute',
-    bottom: 0,
+    top: Dimensions.get(heightParam).height - (Platform.OS === 'ios' ? 150 : 80),
     flex: 10,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    flexGrow: 10,
+    flexGrow: 0,
     width: '100%',
     flexBasis: 100,
     backgroundColor: '#252b33',
-    paddingTop: 10,
-    paddingBottom: 10,
+    paddingTop: 30,
+    paddingBottom: 200,
     height: 100,
     zIndex: 10,
   },
@@ -259,6 +276,8 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 20,
     zIndex: 99,
+    height: 40,
+    marginTop: 30,
   },
   cancelButton: {
     backgroundColor: 'red',

@@ -1,14 +1,13 @@
 import React, { useRef } from "react";
 import { SafeAreaView, StatusBar, StyleSheet, View } from 'react-native';
 import algoliasearch from 'algoliasearch/lite';
-import { InstantSearch, Configure } from 'react-instantsearch-hooks';
+import { InstantSearch } from 'react-instantsearch-hooks';
 import { SearchBox } from "../../components/SearchBox";
 import { InfiniteHits } from "../../components/InfiniteHits";
 import { Hit } from "../../components/Hit";
 import { FiltersView } from '../../views/FiltersView';
 
 const searchClient = algoliasearch('SGF0RZXAXL', '0ac0c3b165eb3773097eca1ac25d8fdd');
-
 export default function App() {
   const listRef = useRef(null);
   function scrollToTop() {
