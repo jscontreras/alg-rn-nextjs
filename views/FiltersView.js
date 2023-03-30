@@ -75,8 +75,9 @@ export const FiltersView = () => {
 
 
   function onCancel() {
-    setButtonText('Set Filters')
+    setButtonText('Set Filters');
     collapseOverlay();
+    setFormState('OPEN');
     setTimeout(() => {
       if (recordedState) {
         setIndexUiState(recordedState);
@@ -92,6 +93,7 @@ export const FiltersView = () => {
       animateOpening();
     } else {
       setButtonText('Set Filters');
+      setFormState('OPEN');
       animateClose();
     }
   };
