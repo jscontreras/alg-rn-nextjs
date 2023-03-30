@@ -22,7 +22,7 @@ export const MyDynamicWidgets = ({ facets }) => {
           ],
           type: CategoriesMenu,
           title: 'Categories',
-          key: `${facetName}-${index}`,
+          key: `${facetName}`,
           rootPath: null,
         });
       }
@@ -31,13 +31,13 @@ export const MyDynamicWidgets = ({ facets }) => {
     // skuProperties.prices.brlDefault.salePrice case
     else if (facetName === 'skuProperties.prices.brlDefault.salePrice') {
       organizedFacets.push({
-        attribute: facetName, type: PriceRangePicker, title: 'Price ($)', key: `${facetName}-${index}`
+        attribute: facetName, type: PriceRangePicker, title: 'Price ($)', key: `${facetName}`
       });
     }
     // skuProperties.prices.ptsDefault.salePrice
     else if (facetName === 'skuProperties.prices.ptsDefault.salePrice') {
       organizedFacets.push({
-        attribute: facetName, type: PriceRangePicker, title: 'Price (points)', key: `${facetName}-${index}`
+        attribute: facetName, type: PriceRangePicker, title: 'Price (points)', key: `${facetName}`
       });
     }
     // add more cases
