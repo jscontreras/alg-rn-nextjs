@@ -1,9 +1,7 @@
 import { useState, useRef } from 'react';
 import { useDynamicWidgets, useInstantSearch } from 'react-instantsearch-hooks';
 import { Dimensions, StyleSheet, ScrollView, TouchableOpacity, View, Text, Animated, Platform } from "react-native";
-import { CategoriesMenu } from "../components/CategoriesMenu";
-import { PriceRangePicker } from '../components/PriceRangePicker';
-import { RefinementList } from '../components/RefinementList';
+import { MyDynamicWidgets } from '../components/MyDinamicWidgets';
 
 const heightParam = Platform.OS == 'ios' ? 'screen' : 'window';
 const windowHeight = Dimensions.get(heightParam).height;
@@ -143,60 +141,6 @@ export const FiltersView = () => {
     </>
   );
 };
-
-const MyDynamicWidgets = ({ facets }) => {
-  let hierarchicalAdded = false;
-  // Array to collect the rendering facets objects.
-  const organizedFacets = [
-  ];
-  // Iterates over active Facets and loads the corresponding React Component
-  facets.forEach((facetName, index) => {
-    if (facetName.startsWith('skuProperties.hierarchicalCategories')) {
-      if (!hierarchicalAdded) {
-        hierarchicalAdded = true;
-        organizedFacets.push({
-          attributes: [
-            'skuProperties.hierarchicalCategories.lvl0',
-            'skuProperties.hierarchicalCategories.lvl1',
-            'skuProperties.hierarchicalCategories.lvl2'
-          ],
-          type: CategoriesMenu,
-          title: 'Categories',
-          key: `${facetName}-${index}`,
-          rootPath: null,
-        });
-      }
-    }
-
-    // skuProperties.prices.brlDefault.salePrice case
-    else if (facetName === 'skuProperties.prices.brlDefault.salePrice') {
-      organizedFacets.push({
-        attribute: facetName, type: PriceRangePicker, title: 'Price ($)', key: `${facetName}-${index}`
-      });
-    }
-    // skuProperties.prices.ptsDefault.salePrice
-    else if (facetName === 'skuProperties.prices.ptsDefault.salePrice') {
-      organizedFacets.push({
-        attribute: facetName, type: PriceRangePicker, title: 'Price (points)', key: `${facetName}-${index}`
-      });
-    }
-    // add more cases
-    else if (!facetName.startsWith('skuProperties.hierarchicalCategories')) {
-      organizedFacets.push({
-        attribute: facetName, type: RefinementList, title: facetName.split('.').pop(), key: `${facetName}-${index}`
-      });
-    }
-
-  });
-  return <View styles='facetsContainer'>
-    {organizedFacets.map(facet => {
-      const DynamicComponent = facet.type;
-      const facetProps = { ...facet };
-      delete facetProps.type;
-      return <DynamicComponent {...facetProps} />
-    })}
-  </View>
-}
 
 const styles = StyleSheet.create({
   filtersContainer: {
