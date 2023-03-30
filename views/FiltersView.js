@@ -10,7 +10,6 @@ export const FiltersView = () => {
   const { indexUiState, setIndexUiState } = useInstantSearch();
   const [transformY, setTransformY] = useState(0);
   const [recordedState, setRecordedState] = useState(null);
-  const [buttonText, setButtonText] = useState('Set Filters');
   const [formState, setFormState] = useState('OPEN');
   const positionAnim = useRef(new Animated.Value(0)).current;
   let start = null;
@@ -75,7 +74,6 @@ export const FiltersView = () => {
 
 
   function onCancel() {
-    setButtonText('Set Filters');
     collapseOverlay();
     setFormState('OPEN');
     setTimeout(() => {
@@ -85,34 +83,27 @@ export const FiltersView = () => {
     }, 400);
   }
 
-  const triggerOverlay = () => {
+  const toggleOverlay = () => {
     setRecordedState(indexUiState);
     if (formState == 'OPEN') {
-      setButtonText('Submit');
       setFormState('CLOSE');
       animateOpening();
     } else {
-      setButtonText('Set Filters');
       setFormState('OPEN');
       animateClose();
     }
   };
 
-
-
   const collapseOverlay = () => {
     setFormState('OPEN');
     animateClose();
-    setButtonText('Set Filters')
   };
-
 
   // Get all the Available refinements and render them.
   const { attributesToRender } = useDynamicWidgets({ facets: ['*'] });
 
   return (
     <>
-      {/* <View style={[styles.overlay, { height: `${height}%%`, opacity }]}> */}
       <Animated.View style={[styles.filtersOverlay, {
         transform: [{ translateY: Platform.OS == 'web' ? transformY : positionAnim },],
       }]}>
@@ -127,15 +118,25 @@ export const FiltersView = () => {
           </ScrollView>
         </View>
       </Animated.View>
+      {/* Buttons Panel */}
       <View style={styles.buttonsOverlay}>
         {formState == 'CLOSE' && (
-          <TouchableOpacity style={[styles.triggerButton, styles.cancelButton]} onPress={onCancel}>
-            <Text style={styles.triggerButtonText}>Cancel</Text>
-          </TouchableOpacity>
+          <>
+            <TouchableOpacity style={[styles.triggerButton, styles.cancelButton]} onPress={onCancel}>
+              <Text style={styles.triggerButtonText}>Cancel</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.triggerButton} onPress={toggleOverlay}>
+              <Text style={styles.triggerButtonText}>Submit</Text>
+            </TouchableOpacity>
+          </>
         )}
-        <TouchableOpacity style={styles.triggerButton} onPress={triggerOverlay}>
-          <Text style={styles.triggerButtonText}>{buttonText}</Text>
-        </TouchableOpacity>
+        {formState == 'OPEN' && (
+          <>
+            <TouchableOpacity style={styles.triggerButton} onPress={toggleOverlay}>
+              <Text style={styles.triggerButtonText}>Set Filters</Text>
+            </TouchableOpacity>
+          </>
+        )}
       </View>
     </>
   );
@@ -143,21 +144,10 @@ export const FiltersView = () => {
 
 const MyDynamicWidgets = ({ facets }) => {
   let hierarchicalAdded = false;
-  /*
-  {
-    attributes: [
-      'skuProperties.hierarchicalCategories.lvl0',
-      'skuProperties.hierarchicalCategories.lvl1',
-      'skuProperties.hierarchicalCategories.lvl2',
-    ],
-    rootPath: null,
-    type: CategoriesMenu,
-    title: 'Categories',
-    key: `hcat-0`
-  }*/
+  // Array to collect the rendering facets objects.
   const organizedFacets = [
   ];
-
+  // Iterates over active Facets and loads the corresponding React Component
   facets.forEach((facetName, index) => {
     if (facetName.startsWith('skuProperties.hierarchicalCategories')) {
       if (!hierarchicalAdded) {
