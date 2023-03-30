@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
     alignItems: 'stretch'
   },
   buttonsOverlay: {
-    position: 'fixed',
+    position: 'absolute',
     bottom: 0,
     flex: 10,
     flexDirection: 'row',
